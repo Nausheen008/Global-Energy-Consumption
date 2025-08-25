@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Energy Consumption & CO2 Emissions Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Filters & Controls</h3>
+            </div>
+            
+            <div class="filter-group">
+                <label class="form-label">Year Range</label>
+                <div class="year-range">
+                    <input type="range" id="yearStart" min="2000" max="2022" value="2000" class="form-control">
+                    <input type="range" id="yearEnd" min="2000" max="2022" value="2022" class="form-control">
+                </div>
+                <div class="year-display">
+                    <span id="yearStartDisplay">2000</span> - <span id="yearEndDisplay">2022</span>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label class="form-label">Development Status</label>
+                <select id="developmentFilter" class="form-control">
+                    <option value="all">All Countries</option>
+                    <option value="Developed">Developed</option>
+                    <option value="Developing">Developing</option>
+                    <option value="Least Developed">Least Developed</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="form-label">Country Selection</label>
+                <select id="countryFilter" class="form-control" multiple>
+                    <option value="United States">United States</option>
+                    <option value="China">China</option>
+                    <option value="India">India</option>
+                    <option value="Germany">Germany</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="France">France</option>
+                    <option value="Brazil">Brazil</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Russia">Russia</option>
+                    <option value="Japan">Japan</option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button class="btn btn--primary btn--full-width" id="applyFilters">Apply Filters</button>
+                <button class="btn btn--secondary btn--full-width" id="resetFilters">Reset</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <h1>Global Energy Consumption & CO2 Emissions Dashboard</h1>
+                <nav class="dashboard-nav">
+                    <button class="nav-tab active" data-tab="overview">Overview</button>
+                    <button class="nav-tab" data-tab="trends">Trends</button>
+                    <button class="nav-tab" data-tab="comparison">Country Analysis</button>
+                    <button class="nav-tab" data-tab="clustering">Clustering</button>
+                    <button class="nav-tab" data-tab="explorer">Data Explorer</button>
+                </nav>
+            </header>
+
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview-tab">
+                <!-- Key Metrics -->
+                <section class="metrics-section">
+                    <div class="metric-card">
+                        <div class="metric-value" id="totalCountries">195</div>
+                        <div class="metric-label">Total Countries</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="avgCO2">4.8</div>
+                        <div class="metric-label">Avg CO2 per Capita (tons)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="renewablePercent">29%</div>
+                        <div class="metric-label">Renewable Energy Share</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="fossilPercent">71%</div>
+                        <div class="metric-label">Fossil Fuel Share</div>
+                    </div>
+                </section>
+
+                <!-- Overview Charts -->
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3>Global CO2 Emissions Trend</h3>
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="globalCO2Chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Energy Mix Evolution</h3>
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="energyMixChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trends Tab -->
+            <div class="tab-content" id="trends-tab">
+                <div class="chart-grid">
+                    <div class="chart-container full-width">
+                        <h3>Global Energy Consumption Trends</h3>
+                        <div style="position: relative; height: 400px;">
+                            <canvas id="trendsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Country Analysis Tab -->
+            <div class="tab-content" id="comparison-tab">
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3>Top CO2 Emitters (Absolute)</h3>
+                        <div style="position: relative; height: 350px;">
+                            <canvas id="topEmittersChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Top CO2 Emitters (Per Capita)</h3>
+                        <div style="position: relative; height: 350px;">
+                            <canvas id="topPerCapitaChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container full-width">
+                        <h3>GDP vs CO2 Emissions by Development Status</h3>
+                        <div style="position: relative; height: 400px;">
+                            <canvas id="gdpCO2Chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clustering Tab -->
+            <div class="tab-content" id="clustering-tab">
+                <div class="clustering-info">
+                    <h3>K-Means Clustering Analysis</h3>
+                    <p>Countries are segmented based on their energy mix patterns, GDP per capita, and CO2 emissions using machine learning clustering algorithms.</p>
+                </div>
+                
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3>Country Clusters by Energy Mix</h3>
+                        <div class="cluster-image">
+                            <img src="https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/dff1da2cda4af1ff312a154a69b0ff9d/2afd36c8-49a8-4aba-860a-d34aa35ec1e7/1df04dd5.png" alt="K-Means Clustering Results" />
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Cluster Characteristics</h3>
+                        <div style="position: relative; height: 350px;">
+                            <canvas id="clusterChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cluster-summary">
+                    <div class="cluster-info-card">
+                        <h4>Cluster 1: High Renewable Countries</h4>
+                        <p>Countries with higher renewable energy adoption and generally lower CO2 per capita emissions.</p>
+                        <div class="cluster-stats">
+                            <span class="stat">Avg Renewable: 45%</span>
+                            <span class="stat">Avg CO2: 3.2 tons</span>
+                        </div>
+                    </div>
+                    <div class="cluster-info-card">
+                        <h4>Cluster 2: Fossil-Dependent Countries</h4>
+                        <p>Countries heavily reliant on fossil fuels with higher CO2 emissions per capita.</p>
+                        <div class="cluster-stats">
+                            <span class="stat">Avg Fossil: 78%</span>
+                            <span class="stat">Avg CO2: 8.7 tons</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Explorer Tab -->
+            <div class="tab-content" id="explorer-tab">
+                <div class="explorer-controls">
+                    <div class="explorer-header">
+                        <h3>Data Explorer</h3>
+                        <div class="export-controls">
+                            <button class="btn btn--secondary" id="exportData">Export Filtered Data</button>
+                            <button class="btn btn--outline" id="viewStats">View Statistics</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Country</th>
+                                <th>Year</th>
+                                <th>CO2 per Capita</th>
+                                <th>GDP per Capita</th>
+                                <th>Renewable Share</th>
+                                <th>Development Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button class="btn btn--outline" id="prevPage">Previous</button>
+                    <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                    <button class="btn btn--outline" id="nextPage">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Statistics -->
+    <div class="modal hidden" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Dataset Statistics</h3>
+                <button class="btn btn--outline" id="closeModal">×</button>
+            </div>
+            <div class="modal-body" id="statsContent">
+                <!-- Statistics will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
